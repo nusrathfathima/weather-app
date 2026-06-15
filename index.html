@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Weather App — Nusrath Fathima</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#09090b;--surface:#111113;--surface2:#18181b;
+  --border:#27272a;--border2:#3f3f46;
+  --text:#fafafa;--muted:#a1a1aa;--subtle:#52525b;
+  --violet:#7c6dfa;--violet-dim:#4f46e5;--violet-glow:rgba(124,109,250,.18);
+  --emerald:#10b981;--r:14px;--r-sm:8px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;animation:drift 12s ease-in-out infinite alternate;}
+.glow-1{width:500px;height:500px;background:var(--violet-glow);top:-150px;right:-100px;}
+.glow-2{width:300px;height:300px;background:rgba(16,185,129,.07);bottom:10%;left:-100px;animation-delay:-5s;}
+@keyframes drift{0%{transform:translate(0,0);}100%{transform:translate(20px,30px);}}
+
+nav{position:relative;z-index:10;padding:1.25rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);background:rgba(9,9,11,.8);backdrop-filter:blur(20px);}
+.nav-logo{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;background:linear-gradient(135deg,#fff,var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-back{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.825rem;text-decoration:none;transition:color .2s;}
+.nav-back:hover{color:var(--text);}
+.nav-tag{padding:.3rem .75rem;border-radius:99px;font-size:.7rem;font-weight:600;background:rgba(124,109,250,.1);color:var(--violet);border:1px solid rgba(124,109,250,.2);}
+
+.hero{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:4rem 2rem 2rem;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(124,109,250,.1);border:1px solid rgba(124,109,250,.25);color:var(--violet);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .85rem;border-radius:99px;margin-bottom:1.5rem;}
+h1{font-family:'Fraunces',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;letter-spacing:-.03em;margin-bottom:1rem;line-height:1.1;}
+h1 em{font-style:italic;font-weight:300;color:var(--violet);}
+.hero-sub{color:var(--muted);font-size:.95rem;line-height:1.8;max-width:500px;margin:0 auto 2rem;}
+.tag-row{display:flex;justify-content:center;flex-wrap:wrap;gap:.5rem;margin-bottom:3rem;}
+.tag{padding:.3rem .75rem;border-radius:99px;font-size:.72rem;font-weight:600;background:var(--surface2);border:1px solid var(--border);color:var(--muted);}
+.tag-v{background:rgba(124,109,250,.1);color:var(--violet);border-color:rgba(124,109,250,.2);}
+.tag-e{background:rgba(16,185,129,.1);color:#34d399;border-color:rgba(16,185,129,.2);}
+.tag-a{background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.2);}
+
+.app-card{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:0 2rem 4rem;}
+.weather-card{background:linear-gradient(145deg,#0f172a,#1e1b4b 50%,#312e81);border-radius:20px;overflow:hidden;border:1px solid rgba(124,109,250,.2);box-shadow:0 24px 80px rgba(124,109,250,.15);}
+.w-top{padding:1.5rem;}
+.w-search{display:flex;gap:.5rem;margin-bottom:1.5rem;}
+.w-search input{flex:1;padding:.65rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-size:.875rem;outline:none;transition:border-color .2s;}
+.w-search input:focus{border-color:rgba(124,109,250,.6);}
+.w-search input::placeholder{color:rgba(255,255,255,.35);}
+.w-btn{padding:.65rem 1.25rem;background:var(--violet);color:#fff;border:none;border-radius:10px;font-weight:600;font-size:.825rem;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap;}
+.w-btn:hover{background:var(--violet-dim);}
+.w-main{text-align:center;padding:1rem 0 1.5rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;}
+.w-icon{font-size:4.5rem;line-height:1;margin-bottom:.5rem;}
+.w-temp{font-family:'Fraunces',serif;font-size:4rem;font-weight:700;color:#fff;line-height:1;}
+.w-city{font-size:1.1rem;color:rgba(255,255,255,.8);font-weight:600;}
+.w-desc{font-size:.825rem;color:rgba(255,255,255,.45);text-transform:capitalize;letter-spacing:.04em;}
+.w-msg{text-align:center;color:rgba(255,255,255,.35);font-size:.875rem;padding:2rem;}
+.w-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.08);}
+.w-cell{background:rgba(0,0,16,.3);padding:1.1rem .75rem;text-align:center;}
+.w-cell .v{font-size:1.1rem;font-weight:700;color:#fff;}
+.w-cell .l{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:.25rem;text-transform:uppercase;letter-spacing:.06em;}
+
+.features{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 2rem 5rem;}
+.features h2{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;text-align:center;color:var(--muted);}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:border-color .2s;}
+.feature-card:hover{border-color:var(--violet);}
+.f-icon{font-size:1.5rem;margin-bottom:.65rem;}
+.f-title{font-size:.875rem;font-weight:600;margin-bottom:.35rem;}
+.f-desc{font-size:.775rem;color:var(--muted);line-height:1.6;}
+
+footer{margin-top:auto;text-align:center;padding:1.5rem;font-size:.75rem;color:var(--subtle);border-top:1px solid var(--border);position:relative;z-index:1;}
+footer a{color:var(--violet);text-decoration:none;}
+
+@media(max-width:480px){nav{padding:1rem 1.25rem;}.hero{padding:3rem 1.25rem 1.5rem;}.app-card{padding:0 1.25rem 3rem;}.features{padding:0 1.25rem 3rem;}}
+</style>
+</head>
+<body>
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+
+<nav>
+  <div class="nav-logo">Nusrath Fathima</div>
+  <a href="https://nusrathfathima.com" class="nav-back">← Back to Portfolio</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Project 01</div>
+  <h1>Weather <em>App</em></h1>
+  <p class="hero-sub">A real-time weather app that fetches live data for any city in the world using the Open-Meteo API. Search any city and get instant weather conditions.</p>
+  <div class="tag-row">
+    <span class="tag tag-v">React</span>
+    <span class="tag tag-a">REST API</span>
+    <span class="tag tag-e">Responsive Design</span>
+    <span class="tag">async/await</span>
+    <span class="tag">Error Handling</span>
+  </div>
+</div>
+
+<div class="app-card">
+  <div class="weather-card">
+    <div class="w-top">
+      <div class="w-search">
+        <input type="text" id="cityInput" placeholder="Try: London, Tokyo, New York…"/>
+        <button class="w-btn" onclick="fetchWeather()">Search</button>
+      </div>
+      <div class="w-main" id="wMain">
+        <div class="w-icon">🌍</div>
+        <div class="w-msg">Enter a city name above to get started</div>
+      </div>
+    </div>
+    <div class="w-grid">
+      <div class="w-cell"><div class="v" id="wHum">—</div><div class="l">Humidity</div></div>
+      <div class="w-cell"><div class="v" id="wWind">—</div><div class="l">Wind Speed</div></div>
+      <div class="w-cell"><div class="v" id="wFeel">—</div><div class="l">Feels Like</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+  <h2>What it does</h2>
+  <div class="features-grid">
+    <div class="feature-card"><div class="f-icon">🌐</div><div class="f-title">Live API Data</div><div class="f-desc">Fetches real-time weather from Open-Meteo — a free, no-key-required weather API.</div></div>
+    <div class="feature-card"><div class="f-icon">🔍</div><div class="f-title">City Search</div><div class="f-desc">Uses geocoding to find any city in the world by name and get its coordinates.</div></div>
+    <div class="feature-card"><div class="f-icon">⚠️</div><div class="f-title">Error Handling</div><div class="f-desc">Gracefully handles typos, unknown cities, and network errors with clear messages.</div></div>
+    <div class="feature-card"><div class="f-icon">📱</div><div class="f-title">Responsive</div><div class="f-desc">Works beautifully on mobile, tablet, and desktop screens.</div></div>
+  </div>
+</div>
+
+<footer>Built by <a href="https://nusrathfathima.com">Nusrath Fathima</a> · View on <a href="https://github.com/nusrathfathima/weather-app">GitHub</a></footer>
+
+<script>
+const WI={'0':'☀️','1':'🌤️','2':'⛅','3':'☁️','45':'🌫️','48':'🌫️','51':'🌦️','53':'🌦️','55':'🌧️','61':'🌧️','63':'🌧️','65':'🌧️','71':'🌨️','73':'🌨️','75':'❄️','80':'🌦️','81':'🌧️','82':'⛈️','95':'⛈️','96':'⛈️','99':'⛈️'};
+const WD={'0':'Clear sky','1':'Mainly clear','2':'Partly cloudy','3':'Overcast','45':'Foggy','48':'Icy fog','51':'Light drizzle','53':'Drizzle','55':'Heavy drizzle','61':'Light rain','63':'Rain','65':'Heavy rain','71':'Light snow','73':'Snow','75':'Heavy snow','80':'Rain showers','81':'Heavy showers','82':'Violent showers','95':'Thunderstorm','96':'Thunderstorm + hail','99':'Thunderstorm + heavy hail'};
+
+async function fetchWeather(){
+  const city=document.getElementById('cityInput').value.trim();
+  if(!city)return;
+  const m=document.getElementById('wMain');
+  m.innerHTML='<div class="w-msg">🔍 Searching...</div>';
+  ['wHum','wWind','wFeel'].forEach(id=>document.getElementById(id).textContent='—');
+  try{
+    const g=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
+    const gd=await g.json();
+    if(!gd.results?.length)throw new Error('City not found. Try another name.');
+    const{latitude,longitude,name,country}=gd.results[0];
+    const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature&timezone=auto&forecast_days=1`);
+    const wd=await w.json();
+    const cw=wd.current_weather;
+    const code=String(cw.weathercode);
+    const hum=wd.hourly?.relativehumidity_2m?.[0]??'—';
+    const feel=wd.hourly?.apparent_temperature?.[0]??'—';
+    m.innerHTML=`<div class="w-icon">${WI[code]||'🌡️'}</div><div class="w-temp">${Math.round(cw.temperature)}°C</div><div class="w-city">${name}, ${country}</div><div class="w-desc">${WD[code]||'Unknown conditions'}</div>`;
+    document.getElementById('wHum').textContent=hum+'%';
+    document.getElementById('wWind').textContent=Math.round(cw.windspeed)+' km/h';
+    document.getElementById('wFeel').textContent=Math.round(feel)+'°C';
+  }catch(err){
+    m.innerHTML=`<div class="w-msg" style="color:#fb7185">⚠ ${err.message}</div>`;
+  }
+}
+document.getElementById('cityInput').addEventListener('keydown',e=>{if(e.key==='Enter')fetchWeather();});
+</script>
+</body>
+</html>
