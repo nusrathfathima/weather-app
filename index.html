@@ -129,16 +129,29 @@ h1 em{font-style:italic;font-weight:300;color:var(--teal);}
 .fc-day::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,var(--teal-glow),transparent);opacity:0;transition:opacity .25s;pointer-events:none;}
 .fc-day:hover{border-color:var(--teal);transform:translateY(-4px) scale(1.03);box-shadow:0 8px 20px var(--teal-glow);}
 .fc-day:hover::before{opacity:1;}
-.fc-day:hover .fc-icon{transform:scale(1.2) rotate(-6deg);}
 .fc-day.today{border-color:var(--teal);background:linear-gradient(180deg,var(--teal-glow),var(--surface));}
 .fc-day.today .fc-name{color:var(--teal);}
 .fc-name{font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:.45rem;position:relative;}
-.fc-icon{font-size:1.5rem;margin-bottom:.45rem;position:relative;transition:transform .3s var(--ease);display:inline-block;animation:fcfloat 3s ease-in-out infinite;}
-.fc-day:nth-child(2) .fc-icon{animation-delay:.4s;}
-.fc-day:nth-child(3) .fc-icon{animation-delay:.8s;}
-.fc-day:nth-child(4) .fc-icon{animation-delay:1.2s;}
-.fc-day:nth-child(5) .fc-icon{animation-delay:1.6s;}
-@keyframes fcfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.fc-icon{font-size:1.5rem;margin-bottom:.45rem;position:relative;display:inline-block;animation:fcdrift 7s ease-in-out infinite;transform-origin:center;}
+.fc-day:hover .fc-icon{animation-play-state:paused;}
+/* each day gets a slightly different rhythm + offset so they feel independent, like real clouds */
+.fc-day:nth-child(1) .fc-icon{animation-duration:6.5s;animation-delay:-0.5s;}
+.fc-day:nth-child(2) .fc-icon{animation-duration:7.8s;animation-delay:-2.1s;}
+.fc-day:nth-child(3) .fc-icon{animation-duration:6.9s;animation-delay:-3.7s;}
+.fc-day:nth-child(4) .fc-icon{animation-duration:8.4s;animation-delay:-1.3s;}
+.fc-day:nth-child(5) .fc-icon{animation-duration:7.2s;animation-delay:-4.6s;}
+/* organic multi-axis drift: gentle sideways sway + slow vertical bob + subtle scale "breathing" */
+@keyframes fcdrift{
+  0%{transform:translate(0,0) scale(1);}
+  20%{transform:translate(2px,-3px) scale(1.02);}
+  40%{transform:translate(3px,-1px) scale(1.01);}
+  55%{transform:translate(-1px,-4px) scale(1.03);}
+  75%{transform:translate(-3px,-1px) scale(1.01);}
+  90%{transform:translate(-1px,-2px) scale(1.02);}
+  100%{transform:translate(0,0) scale(1);}
+}
+/* keep the playful hover tilt, applied to the day-card hover */
+.fc-day:hover .fc-icon{transform:scale(1.25) rotate(-6deg);}
 .fc-temps{font-size:.74rem;position:relative;margin-bottom:.5rem;}
 .fc-hi{font-weight:700;color:var(--text);}
 .fc-lo{color:var(--subtle);}
