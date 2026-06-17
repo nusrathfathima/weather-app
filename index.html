@@ -95,15 +95,29 @@ h1 em{font-style:italic;font-weight:300;color:var(--teal);}
 .detail-cell .dl{font-size:.6rem;opacity:.65;margin-top:.2rem;text-transform:uppercase;letter-spacing:.05em;}
 
 .forecast{margin-top:1.25rem;}
-.forecast-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);margin-bottom:.75rem;padding-left:.25rem;}
+.forecast-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);margin-bottom:.75rem;padding-left:.25rem;display:flex;align-items:center;gap:.5rem;}
+.forecast-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .forecast-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;}
-.fc-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:.85rem .5rem;text-align:center;transition:all .2s;}
-.fc-day:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 4px 12px var(--teal-glow);}
-.fc-name{font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;}
-.fc-icon{font-size:1.4rem;margin-bottom:.4rem;}
-.fc-temps{font-size:.72rem;}
+.fc-day{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:.9rem .5rem;text-align:center;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease);cursor:default;position:relative;overflow:hidden;opacity:0;transform:translateY(14px);}
+.fc-day.in{opacity:1;transform:translateY(0);}
+.fc-day::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,var(--teal-glow),transparent);opacity:0;transition:opacity .25s;pointer-events:none;}
+.fc-day:hover{border-color:var(--teal);transform:translateY(-4px) scale(1.03);box-shadow:0 8px 20px var(--teal-glow);}
+.fc-day:hover::before{opacity:1;}
+.fc-day:hover .fc-icon{transform:scale(1.2) rotate(-6deg);}
+.fc-day.today{border-color:var(--teal);background:linear-gradient(180deg,var(--teal-glow),var(--surface));}
+.fc-day.today .fc-name{color:var(--teal);}
+.fc-name{font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:.45rem;position:relative;}
+.fc-icon{font-size:1.5rem;margin-bottom:.45rem;position:relative;transition:transform .3s var(--ease);display:inline-block;animation:fcfloat 3s ease-in-out infinite;}
+.fc-day:nth-child(2) .fc-icon{animation-delay:.4s;}
+.fc-day:nth-child(3) .fc-icon{animation-delay:.8s;}
+.fc-day:nth-child(4) .fc-icon{animation-delay:1.2s;}
+.fc-day:nth-child(5) .fc-icon{animation-delay:1.6s;}
+@keyframes fcfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.fc-temps{font-size:.74rem;position:relative;margin-bottom:.5rem;}
 .fc-hi{font-weight:700;color:var(--text);}
 .fc-lo{color:var(--subtle);}
+.fc-bar{height:4px;border-radius:99px;background:var(--surface2);position:relative;overflow:hidden;margin:0 .15rem;}
+.fc-bar-fill{position:absolute;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#60a5fa,var(--teal),var(--amber));transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease);}
 
 .error-msg{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);color:var(--rose);padding:.85rem 1rem;border-radius:var(--r-sm);font-size:.83rem;text-align:center;margin-bottom:1rem;}
 
@@ -324,19 +338,39 @@ function renderWeather(data){
     </div>`;
 
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  // find overall min/max across the 5 days to scale the temp bars
+  let gMin=Infinity,gMax=-Infinity;
+  for(let i=0;i<d.time.length;i++){
+    gMin=Math.min(gMin,d.temperature_2m_min[i]);
+    gMax=Math.max(gMax,d.temperature_2m_max[i]);
+  }
+  const span=(gMax-gMin)||1;
   let fc='';
   for(let i=0;i<d.time.length;i++){
     const dt=new Date(d.time[i]);
     const dayName=i===0?'Today':days[dt.getDay()];
     const fcode=String(d.weather_code[i]);
-    fc+=`<div class="fc-day">
+    const lo=d.temperature_2m_min[i],hi=d.temperature_2m_max[i];
+    const left=((lo-gMin)/span)*100;
+    const width=((hi-lo)/span)*100;
+    fc+=`<div class="fc-day${i===0?' today':''}">
       <div class="fc-name">${dayName}</div>
       <div class="fc-icon">${WI[fcode]||'🌡️'}</div>
-      <div class="fc-temps"><span class="fc-hi">${cvt(d.temperature_2m_max[i])}°</span> <span class="fc-lo">${cvt(d.temperature_2m_min[i])}°</span></div>
+      <div class="fc-temps"><span class="fc-hi">${cvt(hi)}°</span> <span class="fc-lo">${cvt(lo)}°</span></div>
+      <div class="fc-bar"><div class="fc-bar-fill" data-left="${left}" data-width="${width}"></div></div>
     </div>`;
   }
   document.getElementById('forecastRow').innerHTML=fc;
   document.getElementById('forecastWrap').style.display='block';
+  // staggered reveal + animate bars
+  const cards=document.querySelectorAll('.fc-day');
+  cards.forEach((card,i)=>{
+    setTimeout(()=>{
+      card.classList.add('in');
+      const bar=card.querySelector('.fc-bar-fill');
+      if(bar){bar.style.left=bar.dataset.left+'%';bar.style.width=bar.dataset.width+'%';bar.style.transform='scaleX(1)';}
+    },i*90);
+  });
 }
 
 function toggleTheme(){
