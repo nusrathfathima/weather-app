@@ -256,7 +256,7 @@ footer a{color:var(--text);text-decoration:underline;text-underline-offset:2px;}
   <p class="hero-sub">Real-time weather and a 5-day forecast for any city — with live conditions, detailed stats, and your location detected automatically.</p>
 </div>
 
-<div class="app-wrap">
+<div class="app-wrap" id="appWrap">
   <div class="search-bar">
     <div class="search-input-wrap">
       <span class="search-icon">🔍</span>
@@ -470,6 +470,12 @@ function renderWeather(data){
   }
   document.getElementById('forecastRow').innerHTML=fc;
   document.getElementById('forecastWrap').style.display='block';
+  // auto-scroll so search bar + current weather + 5-day forecast are framed together
+  setTimeout(()=>{
+    const wrap=document.getElementById('appWrap');
+    const y=wrap.getBoundingClientRect().top+window.pageYOffset-12;
+    window.scrollTo({top:y,behavior:'smooth'});
+  },120);
   // staggered reveal + animate bars
   const cards=document.querySelectorAll('.fc-day');
   cards.forEach((card,i)=>{
@@ -487,6 +493,9 @@ function toggleTheme(){
   else{html.setAttribute('data-theme','dark');btn.textContent='☀️';localStorage.setItem('nf_theme','dark');}
 }
 
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+window.addEventListener('beforeunload',function(){window.scrollTo(0,0);});
+window.addEventListener('load',function(){window.scrollTo(0,0);});
 document.getElementById('cityInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchCity();});
 (function(){
   if(localStorage.getItem('nf_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').textContent='☀️';}
