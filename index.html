@@ -44,30 +44,59 @@ body::after{width:300px;height:300px;background:rgba(141,197,252,.5);bottom:5%;l
 [data-theme="dark"] body::before{opacity:.25;}
 [data-theme="dark"] body::after{opacity:.3;}
 
-/* ── SIDE DECORATIONS — floating weather elements in the margins ── */
-.deco{position:fixed;z-index:0;pointer-events:none;user-select:none;}
-.deco-emoji{font-size:3rem;opacity:.22;filter:drop-shadow(0 4px 16px rgba(0,0,0,.1));}
-/* left side */
-.deco.d1{top:18%;left:3%;animation:dfloat 9s ease-in-out infinite;}
-.deco.d2{top:46%;left:7%;animation:dfloat 11s ease-in-out infinite;animation-delay:-3s;}
-.deco.d3{top:74%;left:4%;animation:dfloat 13s ease-in-out infinite;animation-delay:-6s;}
-/* right side */
-.deco.d4{top:24%;right:4%;animation:dfloat2 10s ease-in-out infinite;}
-.deco.d5{top:55%;right:7%;animation:dfloat2 12s ease-in-out infinite;animation-delay:-4s;}
-.deco.d6{top:80%;right:3%;animation:dfloat2 14s ease-in-out infinite;animation-delay:-7s;}
-@keyframes dfloat{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-22px) rotate(4deg);}}
-@keyframes dfloat2{0%,100%{transform:translateY(0) rotate(4deg);}50%{transform:translateY(-26px) rotate(-4deg);}}
-/* show the right set per theme */
-.deco-light{display:block;}
-.deco-dark{display:none;}
-[data-theme="dark"] .deco-light{display:none;}
-[data-theme="dark"] .deco-dark{display:block;}
-/* twinkle for stars in dark mode */
-.deco-dark.twinkle{animation:dfloat 9s ease-in-out infinite,twinkle 3s ease-in-out infinite;}
-@keyframes twinkle{0%,100%{opacity:.3;}50%{opacity:.08;}}
-/* hide decorations on smaller screens where there's no margin room */
-@media(max-width:1100px){.deco{display:none!important;}}
-@media(prefers-reduced-motion:reduce){.deco{animation:none!important;}}
+/* ── 3-COLUMN LAYOUT ── */
+.layout{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:1rem 1.5rem 4rem;display:grid;grid-template-columns:240px minmax(0,1fr) 240px;gap:1.25rem;align-items:start;}
+.app-wrap{width:100%;}
+
+/* ── SIDE RAILS ── */
+.rail{position:sticky;top:1rem;display:flex;flex-direction:column;gap:.6rem;background:var(--glass);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid var(--glass-border);border-radius:var(--r-sm);box-shadow:var(--shadow);padding:1rem .85rem;min-height:120px;}
+.rail-head{display:flex;align-items:center;justify-content:space-between;}
+.rail-title{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.rail-empty{font-size:.72rem;color:var(--subtle);line-height:1.5;text-align:center;padding:.5rem .25rem;}
+
+/* pinned city cards */
+.pinned-list{display:flex;flex-direction:column;gap:.5rem;}
+.pin-card{display:flex;align-items:center;gap:.6rem;padding:.6rem .7rem;background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:12px;cursor:pointer;transition:all .2s;position:relative;}
+.pin-card:hover{background:var(--glass-hover);transform:translateY(-2px);}
+.pin-icon{font-size:1.5rem;line-height:1;}
+.pin-info{flex:1;min-width:0;}
+.pin-name{font-size:.78rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pin-temp{font-size:.7rem;color:var(--muted);}
+.pin-remove{position:absolute;top:.25rem;right:.35rem;font-size:.7rem;color:var(--subtle);background:none;border:none;cursor:pointer;opacity:0;transition:opacity .2s;line-height:1;}
+.pin-card:hover .pin-remove{opacity:1;}
+.pin-remove:hover{color:var(--rose);}
+
+/* hourly rail */
+.hourly-list{display:flex;flex-direction:column;gap:.4rem;max-height:560px;overflow-y:auto;padding-right:2px;}
+.hourly-list::-webkit-scrollbar{width:3px;}
+.hourly-list::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:99px;}
+.hour-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.5rem;padding:.45rem .6rem;background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:10px;transition:all .2s;opacity:0;transform:translateX(8px);}
+.hour-row.in{opacity:1;transform:translateX(0);}
+.hour-row:hover{background:var(--glass-hover);}
+.hour-row.now{border-color:var(--accent);background:var(--glass-hover);}
+.hour-time{font-size:.7rem;font-weight:600;color:var(--muted);min-width:38px;}
+.hour-icon{font-size:1.1rem;text-align:center;}
+.hour-temp{font-size:.78rem;font-weight:700;color:var(--text);text-align:right;}
+
+/* pin button on the weather card */
+.wc-pin{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:99px;padding:.25rem .7rem;font-size:.68rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:.3rem;margin-top:.5rem;}
+.wc-pin:hover{background:rgba(255,255,255,.3);}
+.wc-pin.pinned{background:var(--accent);border-color:var(--accent);}
+
+/* ── RESPONSIVE: collapse rails ── */
+@media(max-width:1080px){
+  .layout{grid-template-columns:1fr;max-width:680px;}
+  .rail{position:static;}
+  .rail-right{order:2;}
+  .rail-left{order:3;}
+  .app-wrap{order:1;}
+  .hourly-list{max-height:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;}
+  .hour-row{flex-direction:column;min-width:64px;grid-template-columns:none;text-align:center;gap:.25rem;}
+  .hour-temp,.hour-time{text-align:center;}
+  .pinned-list{flex-direction:row;flex-wrap:wrap;}
+  .pin-card{flex:1;min-width:140px;}
+}
+@media(prefers-reduced-motion:reduce){.hour-row{transition:none;}}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:99px;}
@@ -91,7 +120,6 @@ h1{font-family:'Fraunces',serif;font-size:clamp(2rem,5vw,3rem);font-weight:700;l
 h1 em{font-style:italic;font-weight:300;}
 .hero-sub{color:var(--muted);font-size:.925rem;line-height:1.7;max-width:460px;margin:0 auto;}
 
-.app-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:1.5rem 2rem 4rem;width:100%;}
 
 
 .search-bar{display:flex;gap:.5rem;margin-bottom:.85rem;}
@@ -228,19 +256,7 @@ footer a{color:var(--text);text-decoration:underline;text-underline-offset:2px;}
 </head>
 <body>
 
-<!-- floating side decorations -->
-<div class="deco deco-light d1"><span class="deco-emoji">☀️</span></div>
-<div class="deco deco-light d2"><span class="deco-emoji">☁️</span></div>
-<div class="deco deco-light d3"><span class="deco-emoji">🌤️</span></div>
-<div class="deco deco-light d4"><span class="deco-emoji">⛅</span></div>
-<div class="deco deco-light d5"><span class="deco-emoji">🌥️</span></div>
-<div class="deco deco-light d6"><span class="deco-emoji">🌈</span></div>
-<div class="deco deco-dark twinkle d1"><span class="deco-emoji">⭐</span></div>
-<div class="deco deco-dark d2"><span class="deco-emoji">🌙</span></div>
-<div class="deco deco-dark twinkle d3"><span class="deco-emoji">✨</span></div>
-<div class="deco deco-dark twinkle d4"><span class="deco-emoji">⭐</span></div>
-<div class="deco deco-dark d5"><span class="deco-emoji">☁️</span></div>
-<div class="deco deco-dark twinkle d6"><span class="deco-emoji">✨</span></div>
+
 
 
 <nav>
@@ -256,46 +272,73 @@ footer a{color:var(--text);text-decoration:underline;text-underline-offset:2px;}
   <p class="hero-sub">Real-time weather and a 5-day forecast for any city — with live conditions, detailed stats, and your location detected automatically.</p>
 </div>
 
-<div class="app-wrap" id="appWrap">
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="cityInput" placeholder="Search any city…"/>
-    </div>
-    <button class="loc-btn" onclick="useMyLocation()" title="Use my location" aria-label="Use my location">📍</button>
-    <button class="search-btn" onclick="searchCity()">Search</button>
-  </div>
+<div class="layout" id="appWrap">
 
-  <div class="controls-row">
-    <div class="recent-chips" id="recentChips"></div>
-    <div class="unit-toggle">
-      <button class="unit-btn active" id="btnC" onclick="setUnit('c')">°C</button>
-      <button class="unit-btn" id="btnF" onclick="setUnit('f')">°F</button>
+  <!-- LEFT RAIL: Pinned favorite cities -->
+  <aside class="rail rail-left">
+    <div class="rail-head">
+      <span class="rail-title">📌 Pinned Cities</span>
     </div>
-  </div>
-
-  <div id="errorBox"></div>
-
-  <div class="weather-card">
-    <div class="weather-bg bg-default" id="weatherBg"></div>
-    <div class="cloud-layer" id="cloudLayer">
-      <div class="cloud c1"></div>
-      <div class="cloud c2"></div>
-      <div class="cloud c3"></div>
-      <div class="cloud c4"></div>
-      <div class="cloud c5"></div>
+    <div class="pinned-list" id="pinnedList"></div>
+    <div class="rail-empty" id="pinnedEmpty">
+      Pin a city using the 📌 button on its weather to see it here at a glance.
     </div>
-    <div class="weather-inner">
-      <div id="weatherContent">
-        <div class="wc-msg">📍 Detecting your location…<br/><span style="font-size:.75rem;opacity:.6">Or search for any city above</span></div>
+  </aside>
+
+  <!-- CENTER: main app -->
+  <div class="app-wrap">
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="cityInput" placeholder="Search any city…"/>
+      </div>
+      <button class="loc-btn" onclick="useMyLocation()" title="Use my location" aria-label="Use my location">📍</button>
+      <button class="search-btn" onclick="searchCity()">Search</button>
+    </div>
+
+    <div class="controls-row">
+      <div class="recent-chips" id="recentChips"></div>
+      <div class="unit-toggle">
+        <button class="unit-btn active" id="btnC" onclick="setUnit('c')">°C</button>
+        <button class="unit-btn" id="btnF" onclick="setUnit('f')">°F</button>
       </div>
     </div>
+
+    <div id="errorBox"></div>
+
+    <div class="weather-card">
+      <div class="weather-bg bg-default" id="weatherBg"></div>
+      <div class="cloud-layer" id="cloudLayer">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="cloud c3"></div>
+        <div class="cloud c4"></div>
+        <div class="cloud c5"></div>
+      </div>
+      <div class="weather-inner">
+        <div id="weatherContent">
+          <div class="wc-msg">📍 Detecting your location…<br/><span style="font-size:.75rem;opacity:.6">Or search for any city above</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="forecast" id="forecastWrap" style="display:none;">
+      <div class="forecast-title">5-Day Forecast</div>
+      <div class="forecast-row" id="forecastRow"></div>
+    </div>
   </div>
 
-  <div class="forecast" id="forecastWrap" style="display:none;">
-    <div class="forecast-title">5-Day Forecast</div>
-    <div class="forecast-row" id="forecastRow"></div>
-  </div>
+  <!-- RIGHT RAIL: Hourly forecast -->
+  <aside class="rail rail-right">
+    <div class="rail-head">
+      <span class="rail-title">🕐 Hourly</span>
+    </div>
+    <div class="hourly-list" id="hourlyList"></div>
+    <div class="rail-empty" id="hourlyEmpty">
+      Search a city to see its hour-by-hour forecast here.
+    </div>
+  </aside>
+
 </div>
 
 <div class="features">
@@ -338,7 +381,8 @@ function setUnit(u){
   document.getElementById('btnC').classList.toggle('active',u==='c');
   document.getElementById('btnF').classList.toggle('active',u==='f');
   localStorage.setItem('nf_w_unit',u);
-  if(lastData)renderWeather(lastData);
+  if(lastData){renderWeather(lastData);renderHourly(lastData);}
+  renderPinned();
 }
 
 function getRecent(){return JSON.parse(localStorage.getItem('nf_w_recent')||'[]');}
@@ -396,12 +440,14 @@ function useMyLocation(){
 }
 
 async function loadWeather(lat,lon,label){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto&forecast_days=5`;
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,surface_pressure&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&timezone=auto&forecast_days=5`;
   const res=await fetch(url);
   const data=await res.json();
   data._label=label;
+  data._lat=lat;data._lon=lon;
   lastData=data;
   renderWeather(data);
+  renderHourly(data);
 }
 
 function renderWeather(data){
@@ -425,6 +471,7 @@ function renderWeather(data){
       <div>
         <div class="wc-loc">${data._label}</div>
         <div class="wc-date">${today}</div>
+        <button class="wc-pin${isPinned(data._label)?' pinned':''}" onclick="togglePin()">${isPinned(data._label)?'📌 Pinned':'📌 Pin city'}</button>
       </div>
       <div class="wc-live"><span class="wc-live-dot"></span>Live</div>
     </div>
@@ -487,6 +534,83 @@ function renderWeather(data){
   });
 }
 
+/* ── HOURLY FORECAST RAIL ── */
+function renderHourly(data){
+  const h=data.hourly;
+  if(!h||!h.time){return;}
+  const now=new Date();
+  // find the index of the current hour
+  let startIdx=0;
+  for(let i=0;i<h.time.length;i++){
+    if(new Date(h.time[i])>=now){startIdx=Math.max(0,i-1);break;}
+  }
+  const list=document.getElementById('hourlyList');
+  document.getElementById('hourlyEmpty').style.display='none';
+  let html='';
+  const end=Math.min(startIdx+12,h.time.length);
+  for(let i=startIdx;i<end;i++){
+    const dt=new Date(h.time[i]);
+    const hr=dt.toLocaleTimeString('en-US',{hour:'numeric'});
+    const code=String(h.weather_code[i]);
+    const isNow=(i===startIdx);
+    html+=`<div class="hour-row${isNow?' now':''}">
+      <span class="hour-time">${isNow?'Now':hr}</span>
+      <span class="hour-icon">${WI[code]||'🌡️'}</span>
+      <span class="hour-temp">${cvt(h.temperature_2m[i])}°</span>
+    </div>`;
+  }
+  list.innerHTML=html;
+  // staggered reveal
+  list.querySelectorAll('.hour-row').forEach((row,i)=>{
+    setTimeout(()=>row.classList.add('in'),i*45);
+  });
+}
+
+/* ── PINNED FAVORITE CITIES ── */
+function getPinned(){return JSON.parse(localStorage.getItem('nf_w_pinned')||'[]');}
+function savePinned(p){localStorage.setItem('nf_w_pinned',JSON.stringify(p));}
+function isPinned(label){return getPinned().some(c=>c.label===label);}
+function togglePin(){
+  if(!lastData)return;
+  const label=lastData._label;
+  let p=getPinned();
+  if(isPinned(label)){
+    p=p.filter(c=>c.label!==label);
+  }else{
+    p.unshift({label,lat:lastData._lat,lon:lastData._lon,temp:lastData.current.temperature_2m,code:String(lastData.current.weather_code)});
+    p=p.slice(0,6);
+  }
+  savePinned(p);
+  renderPinned();
+  renderWeather(lastData); // refresh pin button state
+}
+function removePin(label,ev){
+  ev.stopPropagation();
+  savePinned(getPinned().filter(c=>c.label!==label));
+  renderPinned();
+  if(lastData)renderWeather(lastData);
+}
+function renderPinned(){
+  const p=getPinned();
+  const list=document.getElementById('pinnedList');
+  const empty=document.getElementById('pinnedEmpty');
+  if(!p.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=p.map(c=>`
+    <div class="pin-card" onclick="loadPinned(${c.lat},${c.lon},'${c.label.replace(/'/g,"\\'")}')">
+      <span class="pin-icon">${WI[c.code]||'🌡️'}</span>
+      <div class="pin-info">
+        <div class="pin-name">${c.label}</div>
+        <div class="pin-temp">${cvt(c.temp)}${uSym()}</div>
+      </div>
+      <button class="pin-remove" onclick="removePin('${c.label.replace(/'/g,"\\'")}',event)" aria-label="Remove">✕</button>
+    </div>`).join('');
+}
+async function loadPinned(lat,lon,label){
+  clearError();
+  await loadWeather(lat,lon,label);
+}
+
 function toggleTheme(){
   const html=document.documentElement;const btn=document.getElementById('themeToggle');
   if(html.getAttribute('data-theme')==='dark'){html.removeAttribute('data-theme');btn.textContent='🌙';localStorage.setItem('nf_theme','light');}
@@ -501,6 +625,7 @@ document.getElementById('cityInput').addEventListener('keydown',e=>{if(e.key==='
   if(localStorage.getItem('nf_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').textContent='☀️';}
   const su=localStorage.getItem('nf_w_unit');if(su)setUnit(su);
   renderRecent();
+  renderPinned();
   useMyLocation();
 })();
 </script>
