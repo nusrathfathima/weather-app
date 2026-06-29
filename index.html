@@ -299,8 +299,8 @@ footer a{color:var(--text);text-decoration:underline;text-underline-offset:2px;}
     <div class="controls-row">
       <div class="recent-chips" id="recentChips"></div>
       <div class="unit-toggle">
-        <button class="unit-btn active" id="btnC" onclick="setUnit('c')">°C</button>
-        <button class="unit-btn" id="btnF" onclick="setUnit('f')">°F</button>
+        <button class="unit-btn" id="btnC" onclick="setUnit('c')">°C</button>
+        <button class="unit-btn active" id="btnF" onclick="setUnit('f')">°F</button>
       </div>
     </div>
 
@@ -370,7 +370,7 @@ function bgClass(code){
   return'bg-default';
 }
 
-let unit='c';
+let unit='f';
 let lastData=null;
 
 function cvt(celsius){return unit==='c'?Math.round(celsius):Math.round(celsius*9/5+32);}
@@ -411,7 +411,7 @@ async function searchCity(name){
     const gd=await g.json();
     if(!gd.results?.length)throw new Error('City not found. Check the spelling and try again.');
     const r=gd.results[0];
-    await loadWeather(r.latitude,r.longitude,`${r.name}, ${r.country_code}`);
+    await loadWeather(r.latitude,r.longitude,`${r.name}, ${r.country||r.country_code}`);
     addRecent(r.name);
     document.getElementById('cityInput').value='';
   }catch(err){
@@ -623,7 +623,7 @@ window.addEventListener('load',function(){window.scrollTo(0,0);});
 document.getElementById('cityInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchCity();});
 (function(){
   if(localStorage.getItem('nf_theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeToggle').textContent='☀️';}
-  const su=localStorage.getItem('nf_w_unit');if(su)setUnit(su);
+  const su=localStorage.getItem('nf_w_unit');setUnit(su||'f');
   renderRecent();
   renderPinned();
   useMyLocation();
