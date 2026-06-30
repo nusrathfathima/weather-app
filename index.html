@@ -249,6 +249,18 @@ footer a{color:var(--text);text-decoration:underline;text-underline-offset:2px;}
   .forecast-row{gap:.3rem;}
   .fc-day{padding:.6rem .25rem;}
   .fc-icon{font-size:1.15rem;}
+  /* search row + controls wrap cleanly */
+  .search-bar{flex-wrap:wrap;}
+  .search-input-wrap{flex:1 1 100%;}
+  .controls-row{flex-direction:column;align-items:flex-start;gap:.6rem;}
+  .detail-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:380px){
+  .wc-temp{font-size:2.75rem;}
+  .wc-icon{font-size:3rem;}
+  .forecast-row{grid-template-columns:repeat(3,1fr);row-gap:.5rem;}
+  .fc-name{font-size:.66rem;}
+  h1{font-size:1.7rem;}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}body{animation:none!important;}}
 </style>
