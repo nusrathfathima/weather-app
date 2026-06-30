@@ -85,12 +85,12 @@ body::after{width:300px;height:300px;background:rgba(141,197,252,.5);bottom:5%;l
 
 /* ── RESPONSIVE: collapse rails ── */
 @media(max-width:1080px){
-  .layout{grid-template-columns:1fr;max-width:680px;}
+  .layout{grid-template-columns:1fr;max-width:680px;gap:1.5rem;}
   .rail{position:static;}
+  .app-wrap{order:1;}
   .rail-right{order:2;}
   .rail-left{order:3;}
-  .app-wrap{order:1;}
-  .hourly-list{max-height:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;}
+  .hourly-list{max-height:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
   .hour-row{flex-direction:column;min-width:64px;grid-template-columns:none;text-align:center;gap:.25rem;}
   .hour-temp,.hour-time{text-align:center;}
   .pinned-list{flex-direction:row;flex-wrap:wrap;}
@@ -529,12 +529,14 @@ function renderWeather(data){
   }
   document.getElementById('forecastRow').innerHTML=fc;
   document.getElementById('forecastWrap').style.display='block';
-  // auto-scroll so search bar + current weather + 5-day forecast are framed together
-  setTimeout(()=>{
-    const wrap=document.getElementById('appWrap');
-    const y=wrap.getBoundingClientRect().top+window.pageYOffset-12;
-    window.scrollTo({top:y,behavior:'smooth'});
-  },120);
+  // auto-scroll to frame the weather — only on wider screens (on phones it feels jumpy)
+  if(window.innerWidth>700){
+    setTimeout(()=>{
+      const wrap=document.getElementById('appWrap');
+      const y=wrap.getBoundingClientRect().top+window.pageYOffset-12;
+      window.scrollTo({top:y,behavior:'smooth'});
+    },120);
+  }
   // staggered reveal + animate bars
   const cards=document.querySelectorAll('.fc-day');
   cards.forEach((card,i)=>{
